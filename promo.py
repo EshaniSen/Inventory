@@ -142,7 +142,7 @@ if uploaded_file is not None:
         'SKU Description': [filtered_df.iloc[0]['SKU Description']],
         'Select WH': [selected_wh],  
         'Requested QTY': [st.number_input("Requested QTY", min_value=1)],
-        'Ordered Date': [st.date_input("Ordered Date",format ='%d-%m-%Y')]
+        'Ordered Date': [st.date_input("Ordered Date")]
     })
 
     # Display Orders DataFrame
