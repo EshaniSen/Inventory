@@ -6,7 +6,7 @@ def calculate_allocation(df_sorted, orders_df):
     df_sorted['Freshness'] = df_sorted['Freshness'].str.rstrip('%').astype(float) / 100
     
     # Convert the "MFG Date" column to datetime.date
-    df_sorted['MFG Date'] = pd.to_datetime(df_sorted['MFG Date']).dt.date
+    df_sorted['MFG Date'] = pd.to_datetime(df_sorted['MFG Date'], format='%d-%m-%Y').dt.date
 
     # Sort the DataFrame by warehouse, promotion, and manufacturing date in ascending order
     df_sorted = df_sorted.sort_values(['WH', 'Remarks', 'MFG Date'])
@@ -100,10 +100,9 @@ def calculate_allocation(df_sorted, orders_df):
 
     # Format the "MFG Date" and "Expiration Date" columns to "dd-mm-yyyy" format in df_sorted
     df_sorted['MFG Date'] = pd.to_datetime(df_sorted['MFG Date']).dt.strftime('%d-%m-%Y')
-    df_sorted['Expiration Date'] = pd.to_datetime(df_sorted['Expiration Date']).dt.strftime('%d-%m-%Y')
+    df_sorted['Expiration Date'] = pd.to_datetime(df_sorted['Expiration Date'], format='%d-%m-%Y').dt.strftime('%d-%m-%Y')
 
     return df_sorted, allocation_df
-
 
 
 # Streamlit app
@@ -122,8 +121,8 @@ if uploaded_file is not None:
     df['Freshness'] = (df['Freshness'] * 100).round(2).astype(str) + '%'
 
     # Format the "MFG Date" and "Expiration Date" columns to "dd-mm-yyyy" format in df
-    df['MFG Date'] = pd.to_datetime(df['MFG Date']).dt.strftime('%d-%m-%Y')
-    df['Expiration Date'] = pd.to_datetime(df['Expiration Date']).dt.strftime('%d-%m-%Y')
+    df['MFG Date'] = pd.to_datetime(df['MFG Date'], format='%d-%m-%Y').dt.strftime('%d-%m-%Y')
+    df['Expiration Date'] = pd.to_datetime(df['Expiration Date'], format='%d-%m-%Y').dt.strftime('%d-%m-%Y')
 
     # Select SKU and warehouse
     selected_sku = st.selectbox("Select SKU", df['SKU Description'].unique())
@@ -159,5 +158,3 @@ if uploaded_file is not None:
     # Display the updated DataFrame with allocated quantities for the selected SKU and warehouse
     st.subheader("Updated DataFrame for Selected SKU and Warehouse")
     st.write(df_sorted[(df_sorted['SKU Description'] == selected_sku) & (df_sorted['WH'] == selected_wh)][['WH', 'itemNo', 'SKU Description', 'lotNo', 'Total Stock']].to_html(index=False), unsafe_allow_html=True)  # Remove index numbers from display
-
-
