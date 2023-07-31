@@ -107,60 +107,57 @@ def calculate_allocation(df_sorted, orders_df):
 
 
 # Streamlit app
-def main():
-    st.markdown("<h1 style='text-align: center;'>Inventory Management</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center;'>Inventory Management</h1>", unsafe_allow_html=True)
 
-    # Upload file
-    uploaded_file = st.file_uploader("Upload file")
-    if uploaded_file is not None:
-        df = pd.read_excel(uploaded_file)  # Read the uploaded file into a DataFrame
+# Upload file
+uploaded_file = st.file_uploader("Upload file")
+if uploaded_file is not None:
+    df = pd.read_excel(uploaded_file)  # Read the uploaded file into a DataFrame
 
-        # Display the DataFrame
-        st.subheader("Input DataFrame")
-        st.write(df)
+    # Display the DataFrame
+    st.subheader("Input DataFrame")
+    st.write(df)
 
-        # Format the "Freshness" column in the DataFrame to display as percentages
-        df['Freshness'] = (df['Freshness'] * 100).round(2).astype(str) + '%'
+    # Format the "Freshness" column in the DataFrame to display as percentages
+    df['Freshness'] = (df['Freshness'] * 100).round(2).astype(str) + '%'
 
-        # Format the "MFG Date" and "Expiration Date" columns to "dd-mm-yyyy" format in df
-        df['MFG Date'] = pd.to_datetime(df['MFG Date']).dt.strftime('%d-%m-%Y')
-        df['Expiration Date'] = pd.to_datetime(df['Expiration Date']).dt.strftime('%d-%m-%Y')
+    # Format the "MFG Date" and "Expiration Date" columns to "dd-mm-yyyy" format in df
+    df['MFG Date'] = pd.to_datetime(df['MFG Date']).dt.strftime('%d-%m-%Y')
+    df['Expiration Date'] = pd.to_datetime(df['Expiration Date']).dt.strftime('%d-%m-%Y')
 
-        # Select SKU and warehouse
-        selected_sku = st.selectbox("Select SKU", df['SKU Description'].unique())
-        selected_wh = st.selectbox("Select WH", df['WH'].unique())
+    # Select SKU and warehouse
+    selected_sku = st.selectbox("Select SKU", df['SKU Description'].unique())
+    selected_wh = st.selectbox("Select WH", df['WH'].unique())
 
-        # Filter DataFrame based on selected SKU and warehouse
-        filtered_df = df[(df['SKU Description'] == selected_sku) & (df['WH'] == selected_wh)]
+    # Filter DataFrame based on selected SKU and warehouse
+    filtered_df = df[(df['SKU Description'] == selected_sku) & (df['WH'] == selected_wh)]
 
-        # Display EDA table
-        st.subheader("EDA")
-        st.write(filtered_df[['SKU Description', 'lotNo', 'IN_HAND_QTY', 'Total Stock', 'MFG Date', 'Expiration Date', 'Freshness', 'Remarks']].to_html(index=False), unsafe_allow_html=True)  # Remove index numbers from display
+    # Display EDA table
+    st.subheader("EDA")
+    st.write(filtered_df[['SKU Description', 'lotNo', 'IN_HAND_QTY', 'Total Stock', 'MFG Date', 'Expiration Date', 'Freshness', 'Remarks']].to_html(index=False), unsafe_allow_html=True)  # Remove index numbers from display
 
-        # Orders DataFrame
-        orders_df = pd.DataFrame({
-            'itemNo': [filtered_df.iloc[0]['itemNo']],
-            'SKU Description': [filtered_df.iloc[0]['SKU Description']],
-            'Select WH': [selected_wh],  # Correct column name for the warehouse
-            'Requested QTY': [st.number_input("Requested QTY", min_value=1)],
-            'Ordered Date': [st.date_input("Ordered Date")]
-        })
+    # Orders DataFrame
+    orders_df = pd.DataFrame({
+        'itemNo': [filtered_df.iloc[0]['itemNo']],
+        'SKU Description': [filtered_df.iloc[0]['SKU Description']],
+        'Select WH': [selected_wh],  # Correct column name for the warehouse
+        'Requested QTY': [st.number_input("Requested QTY", min_value=1)],
+        'Ordered Date': [st.date_input("Ordered Date")]
+    })
 
-        # Display Orders DataFrame
-        st.subheader("Orders")
-        st.write(orders_df.to_html(index=False), unsafe_allow_html=True)  # Remove index numbers from display
+    # Display Orders DataFrame
+    st.subheader("Orders")
+    st.write(orders_df.to_html(index=False), unsafe_allow_html=True)  # Remove index numbers from display
 
-        # Calculate allocation
-        df_sorted, allocation_df = calculate_allocation(df, orders_df)
+    # Calculate allocation
+    df_sorted, allocation_df = calculate_allocation(df, orders_df)
 
-        # Display Allocation DataFrame
-        st.subheader("Allocation")
-        st.write(allocation_df[['lotNo', 'Requested', 'Previous In hand', 'Allocated', 'Remaining In hand']].to_html(index=False), unsafe_allow_html=True)  # Remove index numbers from display
+    # Display Allocation DataFrame
+    st.subheader("Allocation")
+    st.write(allocation_df[['lotNo', 'Requested', 'Previous In hand', 'Allocated', 'Remaining In hand']].to_html(index=False), unsafe_allow_html=True)  # Remove index numbers from display
 
-        # Display the updated DataFrame with allocated quantities for the selected SKU and warehouse
-        st.subheader("Updated DataFrame for Selected SKU and Warehouse")
-        st.write(df_sorted[(df_sorted['SKU Description'] == selected_sku) & (df_sorted['WH'] == selected_wh)][['WH', 'itemNo', 'SKU Description', 'lotNo', 'Total Stock']].to_html(index=False), unsafe_allow_html=True)  # Remove index numbers from display
+    # Display the updated DataFrame with allocated quantities for the selected SKU and warehouse
+    st.subheader("Updated DataFrame for Selected SKU and Warehouse")
+    st.write(df_sorted[(df_sorted['SKU Description'] == selected_sku) & (df_sorted['WH'] == selected_wh)][['WH', 'itemNo', 'SKU Description', 'lotNo', 'Total Stock']].to_html(index=False), unsafe_allow_html=True)  # Remove index numbers from display
 
-# Run the Streamlit app
-if __name__ == '__main__':
-    main()
+
