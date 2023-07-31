@@ -140,9 +140,9 @@ if uploaded_file is not None:
     orders_df = pd.DataFrame({
         'itemNo': [filtered_df.iloc[0]['itemNo']],
         'SKU Description': [filtered_df.iloc[0]['SKU Description']],
-        'Select WH': [selected_wh],  # Correct column name for the warehouse
+        'Select WH': [selected_wh],  
         'Requested QTY': [st.number_input("Requested QTY", min_value=1)],
-        'Ordered Date': [st.date_input("Ordered Date")]
+        'Ordered Date': [st.date_input("Ordered Date",format='mixed')]
     })
 
     # Display Orders DataFrame
