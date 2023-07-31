@@ -11,8 +11,8 @@ def calculate_allocation(df_sorted, orders_df):
     # Sort the DataFrame by warehouse, promotion, and manufacturing date in ascending order
     df_sorted = df_sorted.sort_values(['WH', 'Remarks', 'MFG Date'])
 
-    # Create a new DataFrame to store the allocation results
-    allocation_df = pd.DataFrame(columns=['lotNo', 'Requested', 'Previous In hand', 'Allocated', 'Remaining In hand'])
+    # Create a list to store the allocation results
+    allocation_data = []
 
     for _, order_row in orders_df.iterrows():
         item_no = order_row['itemNo']
@@ -40,17 +40,14 @@ def calculate_allocation(df_sorted, orders_df):
                     allocation_qty = min(ordered_qty, in_hand_qty)
                     ordered_qty -= allocation_qty
 
-                    # Append the allocation details to the temporary DataFrame
-                    allocation_df = allocation_df.append(
-                        {
-                            'lotNo': lot_no,
-                            'Requested': ordered_qty + allocation_qty,
-                            'Previous In hand': in_hand_qty,
-                            'Allocated': allocation_qty,
-                            'Remaining In hand': in_hand_qty - allocation_qty,
-                        },
-                        ignore_index=True,
-                    )
+                    # Append the allocation details to the list
+                    allocation_data.append({
+                        'lotNo': lot_no,
+                        'Requested': ordered_qty + allocation_qty,
+                        'Previous In hand': in_hand_qty,
+                        'Allocated': allocation_qty,
+                        'Remaining In hand': in_hand_qty - allocation_qty,
+                    })
 
                     # Update the in-hand stock and total stock in df_sorted
                     df_sorted.at[_, 'IN_HAND_QTY'] -= allocation_qty
@@ -73,17 +70,14 @@ def calculate_allocation(df_sorted, orders_df):
                     allocation_qty = min(ordered_qty, in_hand_qty)
                     ordered_qty -= allocation_qty
 
-                    # Append the allocation details to the temporary DataFrame
-                    allocation_df = allocation_df.append(
-                        {
-                            'lotNo': lot_no,
-                            'Requested': ordered_qty + allocation_qty,
-                            'Previous In hand': in_hand_qty,
-                            'Allocated': allocation_qty,
-                            'Remaining In hand': in_hand_qty - allocation_qty,
-                        },
-                        ignore_index=True,
-                    )
+                    # Append the allocation details to the list
+                    allocation_data.append({
+                        'lotNo': lot_no,
+                        'Requested': ordered_qty + allocation_qty,
+                        'Previous In hand': in_hand_qty,
+                        'Allocated': allocation_qty,
+                        'Remaining In hand': in_hand_qty - allocation_qty,
+                    })
 
                     # Update the in-hand stock and total stock in df_sorted
                     df_sorted.at[_, 'IN_HAND_QTY'] -= allocation_qty
@@ -91,6 +85,9 @@ def calculate_allocation(df_sorted, orders_df):
 
                     if ordered_qty <= 0:
                         break
+
+    # Convert the list of dictionaries to the Allocation DataFrame
+    allocation_df = pd.DataFrame(allocation_data)
 
     # Create the "Allocated Qty" column by subtracting the initial IN_HAND_QTY from the updated IN_HAND_QTY in df_sorted
     df_sorted['Allocated Qty'] = df_sorted['IN_HAND_QTY'].copy()
@@ -103,6 +100,8 @@ def calculate_allocation(df_sorted, orders_df):
     df_sorted['Expiration Date'] = pd.to_datetime(df_sorted['Expiration Date'], format='%d-%m-%Y').dt.strftime('%d-%m-%Y')
 
     return df_sorted, allocation_df
+
+
 
 
 # Streamlit app
