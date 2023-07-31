@@ -104,6 +104,9 @@ def calculate_allocation(df_sorted, orders_df):
 
 
 
+
+
+
 # Streamlit app
 st.markdown("<h1 style='text-align: center;'>Inventory Management</h1>", unsafe_allow_html=True)
 
